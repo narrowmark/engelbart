@@ -3,10 +3,12 @@ import wx
 import xapian
 from threading import Thread
 
+from stop_words import stop_words
+
 class NoteEntryFrame(wx.Frame):
   def __init__(self, parent):
     wx.Frame.__init__(self, None, title="Note Entry", size=(300, 300))
-    self.db_path = "default_db"
+    self.db_path = "db"
     self.InitUI()
 
   def InitUI(self):
@@ -52,7 +54,7 @@ class NoteEntryFrame(wx.Frame):
   def onCtrlO(self, e):
     pass
 
-  def index(self, db_path="default_db"):
+  def index(self, db_path="db"):
     subject = self.subject_text.GetValue()
     note = self.note_text.GetValue()
     now = time.ctime()
@@ -111,12 +113,23 @@ class PassiveSearchFrame(wx.Frame):
 
     self.Show()
 
-  def search(self, db_path="default_db"):
+  def pre_process(self, query_string):
+    processed = ''
+    query_string = query_string.split(' ')
+    for word in query_string:
+      if word not in stop_words:
+        processed += word + ' '
+    return processed
+
+  def search(self, db_path="db"):
     database = xapian.Database(self.parent.db_path)
 
     enquire = xapian.Enquire(database)
 
     query_string = self.parent.note_text.GetValue()
+    print query_string
+    query_string = self.pre_process(query_string)
+    print query_string
 
     qp = xapian.QueryParser()
     stemmer = xapian.Stem("english")
