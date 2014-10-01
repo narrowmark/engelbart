@@ -127,9 +127,7 @@ class PassiveSearchFrame(wx.Frame):
     enquire = xapian.Enquire(database)
 
     query_string = self.parent.note_text.GetValue()
-    print query_string
     query_string = self.pre_process(query_string)
-    print query_string
 
     qp = xapian.QueryParser()
     stemmer = xapian.Stem("english")
