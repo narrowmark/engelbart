@@ -88,7 +88,7 @@ class PassiveSearchFrame(wx.Frame):
     self.InitUI()
 
     self.timer = wx.Timer(self)
-    self.Bind(wx.EVT_TIMER, self.search, self.timer)
+    self.Bind(wx.EVT_TIMER, self.compare, self.timer)
     self.timer.Start(1500)
 
   def InitUI(self):
@@ -111,6 +111,7 @@ class PassiveSearchFrame(wx.Frame):
     hbox.Add(sizer, proportion=1, flag=wx.ALL|wx.EXPAND, border=10)
     panel.SetSizer(hbox)
 
+    self.init_string = ''
     self.Show()
 
   def pre_process(self, query_string):
@@ -121,7 +122,13 @@ class PassiveSearchFrame(wx.Frame):
         processed += word + ' '
     return processed
 
-  def search(self, db_path="db"):
+  def compare(self, e):
+    query_string = self.parent.note_text.GetValue()
+    if self.init_string != query_string:
+      self.search(e)
+      self.init_string = query_string
+
+  def search(self, e):
     database = xapian.Database(self.parent.db_path)
 
     enquire = xapian.Enquire(database)
